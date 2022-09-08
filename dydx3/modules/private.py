@@ -25,6 +25,7 @@ from dydx3.starkex.transfer import SignableTransfer
 
 
 class Private(object):
+    __account_number = None
 
     def __init__(
         self,
@@ -41,6 +42,9 @@ class Private(object):
         self.default_address = default_address
         self.api_timeout = api_timeout
         self.api_key_credentials = api_key_credentials
+        
+    def set_account_number(self, account_number):
+        self.__account_number = account_number
 
     # ============ Request Helpers ============
 
@@ -64,6 +68,8 @@ class Private(object):
             'DYDX-TIMESTAMP': now_iso_string,
             'DYDX-PASSPHRASE': self.api_key_credentials['passphrase'],
         }
+        if self.__account_number:
+            headers['DYDX-ACCOUNT-NUMBER'] = str(self.__account_number)
         return request(
             self.host + request_path,
             method,
