@@ -1,6 +1,7 @@
 import json
 
-import requests
+import requests, subprocess, random
+from requests_toolbelt.adapters import source
 
 from dydx3.errors import DydxApiError
 from dydx3.helpers.request_helpers import remove_nones
@@ -13,6 +14,7 @@ session.headers.update({
     'User-Agent': 'dydx/python',
 })
 
+addresses = subprocess.check_output(['hostname', '--all-ip-addresses']).decode('utf8').rstrip().split()
 
 class Response(object):
     def __init__(self, data={}, headers=None):
@@ -40,4 +42,6 @@ def request(uri, method, headers=None, data_values={}, api_timeout=None):
 
 
 def send_request(uri, method, headers=None, **kwargs):
+    address = source.SourceAddressAdapter(addresses[random.randrange(len(addresses))])
+    session.mount('https://', address)
     return getattr(session, method)(uri, headers=headers, **kwargs)
